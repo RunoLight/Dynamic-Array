@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <utility>
+#include <iterator>
 using namespace std;
 
 template <class T>
@@ -11,8 +12,8 @@ private:
     int allocated;
     int length;
 public:
-    static int defaultAlloc = 10;
-    static int allocMult = 5;
+    static const int defaultAlloc = 10;
+    static const int allocMult = 5;
 
     Dynarray(): length(1), allocated(defaultAlloc), dataPtr(new T[allocated])
     {
@@ -22,13 +23,13 @@ public:
 
     Dynarray(int size): length(size), allocated(size * allocMult), dataPtr(new T[allocated])
     {
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < length; i++)
             dataPtr[i] = 0;
     }
 
     Dynarray(int size, T value) : length(size), allocated(size * allocMult), dataPtr(new T[allocated])
     {
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < length; i++)
             dataPtr[i] = value;
     }
 
@@ -49,7 +50,7 @@ public:
         if (allocated > length)
         {
             dataPtr[length] = val;
-            lenght++;
+            length++;
         }
         else
         {
@@ -69,14 +70,20 @@ public:
         if (length == 1)
         {
             dataPtr[0] = 0;
-            return nullptr;
+            return;
         }
+        
+        length--; //no matter old value contains (i hope)
 
-        T* pnewa = new T[length-- - 1];
-        for (int i = 0; i < length - 1; i++)
-            pnewa[i] = dataPtr[i];
-        delete[] dataPtr;
-        dataPtr = pnewa;
+        if (allocated / allocMult > length)
+        {
+            allocated /= allocMult;
+            T* newDataPtr = new T[allocated];
+            for (int i = 0; i < length - 1; i++)
+                newDataPtr[i] = dataPtr[i];
+            delete[] dataPtr;
+            dataPtr = newDataPtr;
+        }
     }
 
     int size()
@@ -84,9 +91,20 @@ public:
         return length;
     }
 
+    iterator begin()
+    {
+        DynArray<T>::iterator it;
+        return iterator(this->dataPtr);
+    }
+
+    iterator end()
+    {
+        return iterator(this->dataPtr + length);
+    }
+
     void sort()
     {
-        
+        sort(this->begin(), this->end());
     }
 
     void info()
