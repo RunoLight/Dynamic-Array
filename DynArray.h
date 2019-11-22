@@ -39,6 +39,11 @@ public:
         delete[] dataPtr;
     }
 
+    class iterator
+    {
+
+    };
+
     T& operator[](int index)
     {
         if (index >= length)
@@ -92,15 +97,6 @@ public:
         return length;
     }
 
-    //iterator begin()
-    //{
-    //    return iterator(this->dataPtr);
-    //}
-
-    //iterator end()
-    //{
-    //    return iterator(this->dataPtr + length);
-    //}
     void swap(T* a, T* b)
     {
         T temp = *a;
