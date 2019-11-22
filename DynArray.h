@@ -45,21 +45,21 @@ public:
         int index;
         Dynarray* pData;
     public:
-        iterator()
+        iterator() noexcept
         {
             index = 0;
             pData = nullptr;
         }
-        iterator(int i, Dynarray* p)
+        iterator(int i, Dynarray* p) noexcept
         {
             index = i;
             pData = p;
         }
-        void operator++(int)
+        virtual void operator++(int)
         {
             index++;
         }
-        void operator--(int)
+        virtual void operator--(int)
         {
             index--;
         }
@@ -86,9 +86,31 @@ public:
         }
     };
 
+    class reverse_iterator: public iterator
+    {
+    public:
+        reverse_iterator(): iterator()
+        {}
+        reverse_iterator(int i, Dynarray* p): iterator(i, p) //or *p?
+        {}
+        void operator++(int)
+        {
+            index--;
+        }
+        void operator--(int)
+        {
+            index++;
+        }
+    };
+
     iterator begin()
     {
         return iterator(0, this);
+    }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(length, this);
     }
 
     iterator end()
@@ -96,10 +118,15 @@ public:
         return iterator(length, this);
     }
 
+    reverse_iterator rend()
+    {
+        return reverse_iterator(0, this);
+    }
+
     T& operator[](int index)
     {
         if (index >= length)
-            throw exception("ure doin bad things");
+            throw exception("ure doin bad things"); //std::out_of_range
         return *(dataPtr + index);
     }
 
