@@ -41,8 +41,60 @@ public:
 
     class iterator
     {
-
+    private:
+        int index;
+        Dynarray* pData;
+    public:
+        iterator()
+        {
+            index = 0;
+            pData = nullptr;
+        }
+        iterator(int i, Dynarray* p)
+        {
+            index = i;
+            pData = p;
+        }
+        void operator++(int)
+        {
+            index++;
+        }
+        void operator--(int)
+        {
+            index--;
+        }
+        int operator !=(iterator it)
+        {
+            if (index != it.index)
+                return 1;
+            return 0;
+        }
+        int operator ==(iterator it)
+        {
+            if (index == it.index)
+                return 1;
+            return 0;
+        }
+        T& operator* ()
+        {
+            if (pData)
+            {
+                return pData->dataPtr[index];
+            }
+            else
+                throw 0;
+        }
     };
+
+    iterator begin()
+    {
+        return iterator(0, this);
+    }
+
+    iterator end()
+    {
+        return iterator(length, this);
+    }
 
     T& operator[](int index)
     {
