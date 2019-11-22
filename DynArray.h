@@ -2,6 +2,7 @@
 #include <iostream>
 #include <utility>
 #include <iterator>
+#include <algorithm>
 using namespace std;
 
 template <class T>
@@ -15,19 +16,19 @@ public:
     static const int defaultAlloc = 10;
     static const int allocMult = 5;
 
-    Dynarray(): length(1), allocated(defaultAlloc), dataPtr(new T[allocated])
+    Dynarray(): length(1), allocated(defaultAlloc), dataPtr(new T[defaultAlloc])
     {
         for (int i = 0; i < allocated; i++)
             dataPtr[i] = 0;
     }
 
-    Dynarray(int size): length(size), allocated(size * allocMult), dataPtr(new T[allocated])
+    Dynarray(int size): length(size), allocated(size * allocMult), dataPtr(new T[size * allocMult])
     {
         for (int i = 0; i < length; i++)
             dataPtr[i] = 0;
     }
 
-    Dynarray(int size, T value) : length(size), allocated(size * allocMult), dataPtr(new T[allocated])
+    Dynarray(int size, T value) : length(size), allocated(size * allocMult), dataPtr(new T[size * allocMult])
     {
         for (int i = 0; i < length; i++)
             dataPtr[i] = value;
@@ -41,11 +42,11 @@ public:
     T& operator[](int index)
     {
         if (index >= length)
-            throw std::out_of_range;
+            throw exception("ure doin bad things");
         return *(dataPtr + index);
     }
 
-    void push_back(int val)
+    void push_back(T val)
     {
         if (allocated > length)
         {
@@ -91,20 +92,28 @@ public:
         return length;
     }
 
-    iterator begin()
-    {
-        DynArray<T>::iterator it;
-        return iterator(this->dataPtr);
-    }
+    //iterator begin()
+    //{
+    //    return iterator(this->dataPtr);
+    //}
 
-    iterator end()
+    //iterator end()
+    //{
+    //    return iterator(this->dataPtr + length);
+    //}
+    void swap(T* a, T* b)
     {
-        return iterator(this->dataPtr + length);
+        T temp = *a;
+        *a = *b;
+        *b = temp;
     }
 
     void sort()
     {
-        sort(this->begin(), this->end());
+        for (int i = 0; i < length - 1; i++) 
+            for (int j = 0; j < length - i - 1; j++)
+                if (dataPtr[j] > dataPtr[j + 1])
+                    swap(&dataPtr[j], &dataPtr[j + 1]);
     }
 
     void info()
@@ -114,3 +123,14 @@ public:
             cout << "\n\t" << dataPtr[i];
     }
 };
+
+template <typename TT, class Arr> //6.1
+int find_first(TT val, Arr &arr, int size) //returns index of first value "val" in array "array"
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (arr[i] == val)
+            return i;
+    }
+    return -1;
+}
