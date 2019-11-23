@@ -8,14 +8,17 @@
 using namespace std;
 
 template < class T >
-class allocator
+class MyAllocator
 {
 public:
     typedef T value_type;
     typedef const value_type* const_pointer;
     typedef size_t size_type;
 
-    pointer allocate(size_type count)
+    MyAllocator()
+    {}
+
+    T* allocate(size_type count)
     {
         void* ptr = 0;
         if (count == 0)
@@ -25,15 +28,15 @@ public:
         {
             throw bad_alloc();
         }
-        return ((pointer)ptr);
+        return ((void*)ptr);
     }
 
-    void deallocate(pointer ptr, size_type)
+    void deallocate(void* ptr, size_type)
     {
         ::operator delete(ptr);
     }
 
-    void construct(T* p, const& val)
+    void construct(T* p, const T& val)
     {
         *p = val;
     }
@@ -45,19 +48,21 @@ public:
 };
 
 template < class T,
-           typename Allocator = allocator<T> >
+           typename Allocator = MyAllocator<T> >
 class Dynarray //6.2
 {
 private:
     T* dataPtr;
     int allocated;
     int length;
+    Allocator alloc;
 public:
     static const int defaultAlloc = 10;
     static const int allocMult = 5;
 
-    Dynarray(): length(1), allocated(defaultAlloc), dataPtr(new T[defaultAlloc])
+    Dynarray() : length(1), allocated(defaultAlloc)
     {
+        dataPtr = alloc.allocate(defaultAlloc);
         for (int i = 0; i < allocated; i++)
             dataPtr[i] = 0;
     }
@@ -81,7 +86,7 @@ public:
 
     class iterator
     {
-    private:
+    protected:
         int index;
         Dynarray* pData;
     public:
@@ -135,11 +140,11 @@ public:
         {}
         void operator++(int)
         {
-            index--;
+            this->operator--;
         }
         void operator--(int)
         {
-            index++;
+            this->operator++;
         }
     };
 
