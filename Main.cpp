@@ -5,13 +5,23 @@
 #include <stdlib.h>
 using namespace std;
 
-
+template <typename TT, class Arr> //6.1
+int find_first(TT val, Arr& arr, int size) //returns index of first value "val" in array "array"
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (arr[i] == val)
+            return i;
+    }
+    return -1;
+}
 
 int main()
 {
     // Задание: 6.1 - функция которая будет искать первое вхождение элемента в массиве
     //          6.2 - класс, хранящий данные, умеющий сортировать и умеющий выводить информацию(info(); )
     //          8.1 - итератор
+    //          8.2 - аллокатор
     int iArr[10] = { 2, 5, 7, 15, 60, 80, 90, 10, 10, 0 };
     float fArr[5] = { 2.4f, 3.14f, 2.0f };
     bool bArr[5];

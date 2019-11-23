@@ -187,12 +187,14 @@ public:
         else
         {
             capacity *= allocMult;
-            T* newDataPtr;
-            newDataPtr = alloc.allocate(capacity);
+            T* newDataPtr = alloc.allocate(capacity);
             for (int i = 0; i < length - 1; i++)
                 newDataPtr[i] = dataPtr[i];
             newDataPtr[length - 1] = 0;
-            delete[] dataPtr;
+
+            //delete[] dataPtr;
+            alloc.destroy(dataPtr);
+
             dataPtr = newDataPtr;
         }
     }
@@ -205,15 +207,18 @@ public:
             return;
         }
         
-        length--; //no matter old value contains (i hope)
+        length--; //no matter old value still exist
 
         if (capacity / allocMult > length)
         {
             capacity /= allocMult;
-            T* newDataPtr = new T[capacity];
+            T* newDataPtr = alloc.allocate(capacity);
             for (int i = 0; i < length - 1; i++)
                 newDataPtr[i] = dataPtr[i];
-            delete[] dataPtr;
+
+            //delete[] dataPtr;
+            alloc.destroy(dataPtr);
+
             dataPtr = newDataPtr;
         }
     }
@@ -240,19 +245,9 @@ public:
 
     void info()
     {
-        cout << "\n\t\t Array contains:";
+        cout << "\n\t\t Array contains:\n";
         for (int i = 0; i < length; i++)
-            cout << "\n\t" << dataPtr[i];
+            cout << "\t" << dataPtr[i];
     }
 };
 
-template <typename TT, class Arr> //6.1
-int find_first(TT val, Arr &arr, int size) //returns index of first value "val" in array "array"
-{
-    for (int i = 0; i < size; i++)
-    {
-        if (arr[i] == val)
-            return i;
-    }
-    return -1;
-}
