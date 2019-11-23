@@ -1,11 +1,51 @@
 #pragma once
+
 #include <iostream>
 #include <utility>
 #include <iterator>
 #include <algorithm>
+
 using namespace std;
 
-template <class T>
+template < class T >
+class allocator
+{
+public:
+    typedef T value_type;
+    typedef const value_type* const_pointer;
+    typedef size_t size_type;
+
+    pointer allocate(size_type count)
+    {
+        void* ptr = 0;
+        if (count == 0)
+            ;
+        else if (((size_t)(-1) / sizeof(value_type) < count)
+            || (ptr = ::operator new(count * sizeof(value_type))) == 0)
+        {
+            throw bad_alloc();
+        }
+        return ((pointer)ptr);
+    }
+
+    void deallocate(pointer ptr, size_type)
+    {
+        ::operator delete(ptr);
+    }
+
+    void construct(T* p, const& val)
+    {
+        *p = val;
+    }
+
+    void destroy(T* p)
+    {
+        p->~T();
+    }
+};
+
+template < class T,
+           typename Allocator = allocator<T> >
 class Dynarray //6.2
 {
 private:
