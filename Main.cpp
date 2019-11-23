@@ -45,5 +45,8 @@ int main()
     {
         cout << (*it);
     }
+
+    dataVec.~Dynarray();
+
     system("pause");
 }

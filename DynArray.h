@@ -28,7 +28,7 @@ public:
         {
             throw bad_alloc();
         }
-        return ((void*)ptr);
+        return ((T*)ptr);
     }
 
     void deallocate(void* ptr, size_type)
@@ -53,28 +53,30 @@ class Dynarray //6.2
 {
 private:
     T* dataPtr;
-    int allocated;
-    int length;
+    int capacity; // allocated memory
+    int length;   // using memory (formal amount of elements you can use)
     Allocator alloc;
 public:
     static const int defaultAlloc = 10;
     static const int allocMult = 5;
 
-    Dynarray() : length(1), allocated(defaultAlloc)
+    Dynarray() : length(1), capacity(defaultAlloc)
     {
         dataPtr = alloc.allocate(defaultAlloc);
-        for (int i = 0; i < allocated; i++)
+        for (int i = 0; i < capacity; i++)
             dataPtr[i] = 0;
     }
 
-    Dynarray(int size): length(size), allocated(size * allocMult), dataPtr(new T[size * allocMult])
+    Dynarray(int size): length(size), capacity(size * allocMult)
     {
+        dataPtr = alloc.allocate(size * allocMult);
         for (int i = 0; i < length; i++)
             dataPtr[i] = 0;
     }
 
-    Dynarray(int size, T value) : length(size), allocated(size * allocMult), dataPtr(new T[size * allocMult])
+    Dynarray(int size, T value) : length(size), capacity(size * allocMult)
     {
+        dataPtr = alloc.allocate(size * allocMult);
         for (int i = 0; i < length; i++)
             dataPtr[i] = value;
     }
@@ -177,16 +179,16 @@ public:
 
     void push_back(T val)
     {
-        if (allocated > length)
+        if (capacity > length)
         {
             dataPtr[length] = val;
             length++;
         }
         else
         {
-            allocated *= allocMult;
+            capacity *= allocMult;
             T* newDataPtr;
-            newDataPtr = new T[allocated];
+            newDataPtr = alloc.allocate(capacity);
             for (int i = 0; i < length - 1; i++)
                 newDataPtr[i] = dataPtr[i];
             newDataPtr[length - 1] = 0;
@@ -205,10 +207,10 @@ public:
         
         length--; //no matter old value contains (i hope)
 
-        if (allocated / allocMult > length)
+        if (capacity / allocMult > length)
         {
-            allocated /= allocMult;
-            T* newDataPtr = new T[allocated];
+            capacity /= allocMult;
+            T* newDataPtr = new T[capacity];
             for (int i = 0; i < length - 1; i++)
                 newDataPtr[i] = dataPtr[i];
             delete[] dataPtr;
